@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express') // importing back-end web framework express
 const colors = require('colors') // allows to modify the console text color and style
 const dotenv = require('dotenv').config() //allows for .env file with variables
@@ -14,6 +15,16 @@ app.use(express.urlencoded({extended: false})) //past object with extended = fal
 
 app.use('/api/goals', require('./routes/goalRoutes'))
 app.use('/api/users', require('./routes/userRoutes'))
+
+//Serve Frontend
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static(path.join(__dirname, '../frontend/build')))//react will build out the static asset front-end folder to this directory
+
+    //point any routes to index html
+    app.get('*', (req, res) => res.sendFile(path.resolve(__dirname,'../','frontend','build','index.html')))
+} else{
+    app.get('/', (req,res) => res.send('Please set env to production'))
+}
 
 app.use(errorHandler) // ask app server to override default express error handler
 
